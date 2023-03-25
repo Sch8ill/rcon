@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/Sch8ill/rcon"
+	"github.com/Sch8ill/rcon/color"
 	"github.com/Sch8ill/rcon/config"
 )
 
@@ -33,7 +34,7 @@ func cliAction(c *cli.Context) error {
 		fmt.Println(fmt.Errorf("error while trying to connect: %w", err))
 		return nil
 	}
-	return serveInteractive(rconClient)
+	return serveInteractive(rconClient, c)
 }
 
 func declareFlags() []cli.Flag {
@@ -56,12 +57,19 @@ func declareFlags() []cli.Flag {
 			Value:   config.DefaultTimeout,
 			Usage:   "timeout for the connection to the server",
 		},
+		&cli.BoolFlag{
+			Name:    "no-colors",
+			Aliases: []string{"no-colours"},
+			Value:   false,
+			Usage:   "if the cli should not output colors",
+		},
 	}
 }
 
-func serveInteractive(rconClient *rcon.RconClient) error {
+func serveInteractive(rconClient *rcon.RconClient, c *cli.Context) error {
 	cliPrefix := generateCliPrefix(rconClient.Address)
 	reader := bufio.NewReader(os.Stdin)
+	omitColors := c.Bool("no-colors")
 	fmt.Printf("Conencted to %s. Type ':help' to see a list of available commands provided by this shell.\n", rconClient.Address)
 
 	run:
@@ -86,6 +94,7 @@ func serveInteractive(rconClient *rcon.RconClient) error {
 			if err != nil {
 				panic(err)
 			}
+			response = color.ParseColorCodes(response, !omitColors)
 			fmt.Println(response)
 		}
 	}
