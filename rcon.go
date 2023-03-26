@@ -10,6 +10,7 @@ import (
 
 type ConnectionState int
 
+// an "enum" that represents the current connection state
 const (
 	Connected ConnectionState = iota
 	Disconnected
@@ -24,6 +25,7 @@ type RconClient struct {
 	ConnState ConnectionState
 }
 
+// creates a RCON client and connects and authenticates it
 func Dial(addr string, password string, timeout time.Duration) (*RconClient, error) {
 	rconClient := NewClient(addr, password, timeout)
 
@@ -36,6 +38,7 @@ func Dial(addr string, password string, timeout time.Duration) (*RconClient, err
 	return rconClient, nil
 }
 
+// creates a new RCON client
 func NewClient(addr string, password string, timeout time.Duration) *RconClient {
 	return &RconClient{
 		Address:   addr,
@@ -45,6 +48,7 @@ func NewClient(addr string, password string, timeout time.Duration) *RconClient 
 	}
 }
 
+// establishes the underlying TCP connenction of the RCON client
 func (rc *RconClient) Connect() error {
 	if !strings.Contains(rc.Address, ":") {
 		rc.Address = rc.Address + ":" + config.DefaultPort
@@ -64,6 +68,7 @@ func (rc *RconClient) Connect() error {
 	return nil
 }
 
+// authenticates the client using the clients password
 func (rc *RconClient) Authenticate() error {
 	authPacket := newServerBoundPacket(SERVERDATA_AUTH, rc.Password)
 	rc.Conn.Write(authPacket.Bytes())
@@ -82,17 +87,25 @@ func (rc *RconClient) Authenticate() error {
 	return nil
 }
 
+// executes a command on the remote server
 func (rc *RconClient) ExecuteCmd(cmd string) (string, error) {
+	// check if the client is connected and authenticated
+	if rc.ConnState != Authenticated {
+		return "", errWrongConenctionState
+	}
+
+	// construct the packet and write it to the socket
 	cmdPacket := newServerBoundPacket(SERVERDATA_EXECCOMMAND, cmd)
 	rc.Conn.Write(cmdPacket.Bytes())
 
+	// parse the received packet
 	resPacket, err := newClientBoundPacket(rc.Conn)
 
 	if err != nil {
 		return "", err
 	}
 
-	// the packet send by the the server has to have the same packet id as the request packet
+	// the response packet has to have the same packet id as the request packet
 	if cmdPacket.ID != resPacket.ID {
 		return "", errWrongPacketID
 	}
@@ -100,6 +113,7 @@ func (rc *RconClient) ExecuteCmd(cmd string) (string, error) {
 	return resPacket.getBody(), nil
 }
 
+// "closes" the RCON client by terminating the underlying TCP connection and setting the clients connection state to disconnected
 func (rc *RconClient) Close() {
 	rc.Conn.Close()
 	rc.ConnState = Disconnected
