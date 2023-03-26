@@ -11,5 +11,5 @@ const (
 
 	DefaultTimeout time.Duration = time.Second * 7
 
-	Version = "1.2.0"
+	Version = "1.3.0"
 )
