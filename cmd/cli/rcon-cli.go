@@ -27,16 +27,26 @@ func main() {
 	}
 }
 
-func cliAction(c *cli.Context) error {
-	rconClient, err := rcon.Dial(c.String("address"), c.String("password"), c.Duration("timeout"))
+// the entrypoint of the cli
+func cliAction(ctx *cli.Context) error {
+	rconClient, err := rcon.Dial(ctx.String("address"), ctx.String("password"), ctx.Duration("timeout"))
 
 	if err != nil {
 		fmt.Println(fmt.Errorf("error while trying to connect: %w", err))
 		return nil
 	}
-	return serveInteractive(rconClient, c)
+
+	// check for "single command mode"
+	if cmd := ctx.String("command"); cmd != "" {
+		if err := x(cmd, rconClient, ctx); err != nil {
+			return err
+		}
+		return nil
+	}
+	return serveInteractive(rconClient, ctx)
 }
 
+// declares the flags used by the cli
 func declareFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
@@ -50,6 +60,12 @@ func declareFlags() []cli.Flag {
 			Aliases: []string{"p"},
 			Value:   config.DefaulftPassword,
 			Usage:   "password of the RCON server you want to connect to",
+		},
+		&cli.StringFlag{
+			Name:    "command",
+			Aliases: []string{"c"},
+			Value:   "",
+			Usage:   "a single command to be executed",
 		},
 		&cli.DurationFlag{
 			Name:    "timeout",
@@ -66,13 +82,13 @@ func declareFlags() []cli.Flag {
 	}
 }
 
-func serveInteractive(rconClient *rcon.RconClient, c *cli.Context) error {
+// serves an interactive RCON shell
+func serveInteractive(rconClient *rcon.RconClient, ctx *cli.Context) error {
 	cliPrefix := generateCliPrefix(rconClient.Address)
 	reader := bufio.NewReader(os.Stdin)
-	omitColors := c.Bool("no-colors")
 	fmt.Printf("Conencted to %s. Type ':help' to see a list of available commands provided by this shell.\n", rconClient.Address)
 
-	run:
+run:
 	for {
 		fmt.Print(cliPrefix)
 		cmd, _ := reader.ReadString('\n')
@@ -90,30 +106,32 @@ func serveInteractive(rconClient *rcon.RconClient, c *cli.Context) error {
 			break run
 
 		default:
-			response, err := executeCmd(cmd, rconClient)
-			if err != nil {
-				panic(err)
+			if err := x(cmd, rconClient, ctx); err != nil {
+				return err
 			}
-			response = color.ParseColorCodes(response, !omitColors)
-			fmt.Println(response)
 		}
 	}
 	return nil
 }
 
-func executeCmd(cmd string, rconClient *rcon.RconClient) (string, error) {
-	res, err := rconClient.ExecuteCmd(cmd)
+// executes the command and formats and prints the response
+func x(cmd string, rconClient *rcon.RconClient, ctx *cli.Context) error {
+	response, err := rconClient.ExecuteCmd(cmd)
 	if err != nil {
-		return "", err
+		return fmt.Errorf("error while executing command %w", err)
 	}
-	return res, nil
+	response = color.ParseColorCodes(response, !ctx.Bool("no-colors"))
+	fmt.Println(response)
+	return nil
 }
 
+// closes the underlying RCON client
 func close(rconClient *rcon.RconClient) {
 	fmt.Println("Closing rcon connection...")
 	rconClient.Close()
 }
 
+// generates the cli new line prefix
 func generateCliPrefix(addr string) string {
 	return fmt.Sprintf("rcon@%s:~$ ", addr)
 }
