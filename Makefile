@@ -1,4 +1,4 @@
-BIN_NAME=rcon
+BIN_NAME=rcon-cli
 
 all: build
 
