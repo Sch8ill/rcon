@@ -17,7 +17,7 @@ func main() {
 	app := &cli.App{
 		Flags:     declareFlags(),
 		Action:    cliAction,
-		Usage:     "A rcon CLI for excecuting commands on a remote rcon server",
+		Usage:     "A rcon CLI for executing commands on a remote rcon server",
 		Copyright: "Copyright (c) 2023 Sch8ill",
 		Version:   config.Version,
 	}
@@ -38,7 +38,7 @@ func cliAction(ctx *cli.Context) error {
 
 	// check for "single command mode"
 	if cmd := ctx.String("command"); cmd != "" {
-		if err := x(cmd, rconClient, ctx); err != nil {
+		if err := executeCmd(cmd, rconClient, ctx); err != nil {
 			return err
 		}
 		return nil
@@ -106,7 +106,7 @@ run:
 			break run
 
 		default:
-			if err := x(cmd, rconClient, ctx); err != nil {
+			if err := executeCmd(cmd, rconClient, ctx); err != nil {
 				return err
 			}
 		}
@@ -115,7 +115,7 @@ run:
 }
 
 // executes the command and formats and prints the response
-func x(cmd string, rconClient *rcon.RconClient, ctx *cli.Context) error {
+func executeCmd(cmd string, rconClient *rcon.RconClient, ctx *cli.Context) error {
 	response, err := rconClient.ExecuteCmd(cmd)
 	if err != nil {
 		return fmt.Errorf("error while executing command %w", err)
