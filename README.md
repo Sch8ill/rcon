@@ -7,7 +7,7 @@
  This Go-based RCON client allows Minecraft server administrators to send commands to their server over a remote RCON connection. With this client, you can easily send commands and view output on the console without having to log in directly to the server.
 
  This client implements the RCON protocol used by Minecraft servers and has the potential to work with other game servers as well, though it hasn't been extensively tested with them.
- 
+
  To use the client, you will need to have access to the server's RCON password and IP address/hostname. Once connected, you can send commands through the client's terminal interface and receive output on the console like you would with the standard Minecraft server console.
 
  
@@ -15,7 +15,7 @@
 
 ### prebuild
 
- Download the latest build for your platform in the [release section](https://github.com/Sch8ill/rcon/releases "releases")
+ Download the build for your platform from the [latest release](https://github.com/Sch8ill/rcon/releases/latest "latest release")
 
 ### build
 
@@ -33,7 +33,7 @@
  ```bash
  git clone https://github.com/Sch8ill/rcon
  make -C rcon
- mv rcon/rcon-cli rcon-cli
+ mv rcon/build/rcon-cli rcon-cli
  rm -rf rcon
  ```
 
@@ -57,9 +57,10 @@
   ```
 
 ### Examples
- Move into the directory of the executable and than:
 
- Open up an interactive RCON shell:
+ Move into the directory of the executable and open up a terminal.
+
+ Open up an interactive RCON terminal:
 
  ```bash
  ./rcon-cli -a <the-servers-address> -p <the-servers-password>
@@ -71,4 +72,4 @@
  ./rcon-cli -a <the-servers-address> -p <the-servers-password> -c <the-command-that-shall-be-executed>
  ```
 
- Take a look at the other [command flags](#usage) for other features.
+ Take a look at the other [command flags](#usage) for more features.
