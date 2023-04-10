@@ -10,14 +10,13 @@
 
  To use the client, you will need to have access to the server's RCON password and IP address/hostname. Once connected, you can send commands through the client's terminal interface and receive output on the console like you would with the standard Minecraft server console.
 
- 
 ## Installation
 
-### prebuild
+### Prebuild
 
- Download the build for your platform from the [latest release](https://github.com/Sch8ill/rcon/releases/latest "latest release")
+ Download the latest build for your platform from the [latest release](https://github.com/Sch8ill/rcon/releases/latest "latest release")
 
-### build
+### Build
 
  You can also build your own executable.
  This requires:
@@ -29,7 +28,7 @@
  ```
 
  Run these commands to build the executable:
- 
+
  ```bash
  git clone https://github.com/Sch8ill/rcon
  make -C rcon
@@ -38,6 +37,8 @@
  ```
 
 ## Usage
+
+### CLI
 
  ```txt
  USAGE:
@@ -56,7 +57,7 @@
     --version, -v               print the version
   ```
 
-### Examples
+#### Example commands
 
  Move into the directory of the executable and open up a terminal.
 
@@ -73,3 +74,37 @@
  ```
 
  Take a look at the other [command flags](#usage) for more features.
+
+### Libary
+
+ Install the module using:
+
+ ```bash
+ go get github.com/sch8ill/rcon
+ ```
+
+ Import it:
+
+ ```go
+ import "github.com/sch8ill/rcon"
+ ```
+
+ Create a new RCON client:
+
+ ```go
+ client, err := rcon.Dial("localhost", "password", 5) // address, password, timeout
+ if err != nil {
+   panic(err)
+ }
+ ```
+
+ Execute a command over RCON:
+
+ ```go
+ output, err := client.ExecuteCmd("<your-command>")
+ if err != nil {
+   panic(err)
+ }
+ 
+ fmt.Println(output)
+ ```
