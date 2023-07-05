@@ -52,13 +52,13 @@ func declareFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:    "address",
 			Aliases: []string{"a"},
-			Value:   config.DefaultAddress,
+			Value:   config.GetDefaultAddress(),
 			Usage:   "address of the server you want to connect to (localhost:25575 for example)",
 		},
 		&cli.StringFlag{
 			Name:    "password",
 			Aliases: []string{"p"},
-			Value:   config.DefaulftPassword,
+			Value:   config.GetDefaultPassword(),
 			Usage:   "password of the RCON server you want to connect to",
 		},
 		&cli.StringFlag{
@@ -70,7 +70,7 @@ func declareFlags() []cli.Flag {
 		&cli.DurationFlag{
 			Name:    "timeout",
 			Aliases: []string{"t"},
-			Value:   config.DefaultTimeout,
+			Value:   config.GetDefaultTimeout(),
 			Usage:   "timeout for the connection to the server",
 		},
 		&cli.BoolFlag{
@@ -82,11 +82,11 @@ func declareFlags() []cli.Flag {
 	}
 }
 
-// serves an interactive RCON shell
+// serves an interactive RCON terminal
 func serveInteractive(rconClient *rcon.RconClient, ctx *cli.Context) error {
 	cliPrefix := generateCliPrefix(rconClient.Address)
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("Conencted to %s. Type ':help' to see a list of available commands provided by this shell.\n", rconClient.Address)
+	fmt.Printf("Conencted to %s. Type ':help' to see a list of available commands provided by this terminal.\n", rconClient.Address)
 
 run:
 	for {

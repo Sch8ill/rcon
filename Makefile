@@ -9,4 +9,4 @@ multi-arch:
 	scripts/build-multi-arch.sh build/$(BIN_NAME)
 
 clean:
-	rm -f $(BIN_NAME)*
+	rm -rf build
