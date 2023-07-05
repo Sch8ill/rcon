@@ -1,6 +1,7 @@
 package rcon
 
 import (
+	"fmt"
 	"net"
 	"strings"
 	"time"
@@ -25,7 +26,7 @@ type RconClient struct {
 	ConnState ConnectionState
 }
 
-// creates a RCON client and connects and authenticates it
+// creates a RCON client and establishes a connection
 func Dial(addr string, password string, timeout time.Duration) (*RconClient, error) {
 	rconClient := NewClient(addr, password, timeout)
 
@@ -51,7 +52,7 @@ func NewClient(addr string, password string, timeout time.Duration) *RconClient 
 // establishes the underlying TCP connenction of the RCON client
 func (rc *RconClient) Connect() error {
 	if !strings.Contains(rc.Address, ":") {
-		rc.Address = rc.Address + ":" + config.DefaultPort
+		rc.Address = rc.Address + ":" + fmt.Sprint(config.DefaultPort)
 	}
 
 	if rc.ConnState != Disconnected {
@@ -113,7 +114,8 @@ func (rc *RconClient) ExecuteCmd(cmd string) (string, error) {
 	return resPacket.getBody(), nil
 }
 
-// "closes" the RCON client by terminating the underlying TCP connection and setting the clients connection state to disconnected
+// "closes" the RCON client by terminating the underlying TCP connection
+// and setting the clients connection state to disconnected
 func (rc *RconClient) Close() {
 	rc.Conn.Close()
 	rc.ConnState = Disconnected

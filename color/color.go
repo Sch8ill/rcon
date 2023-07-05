@@ -2,6 +2,7 @@ package color
 
 import "strings"
 
+// Minecraft color and format codes are prefixed by this character ("§")
 const COLOR_CODE_PREFIX string = "§"
 
 // map Minecraft color and format codes to ANSI escape codes
@@ -39,13 +40,14 @@ func ParseColorCodes(str string, colors bool) string {
 		}
 		str += COLOR_CODES["r"]
 	} else {
-		for code, _ := range COLOR_CODES {
+		for code := range COLOR_CODES {
 			str = strings.ReplaceAll(str, COLOR_CODE_PREFIX+code, "")
 		}
 	}
 	return str
 }
 
+// translate a Minecraft color or format code to an ANSI code
 func TranslateColorCode(colorCode string) string {
 	return COLOR_CODES[colorCode]
 }
