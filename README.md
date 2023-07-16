@@ -75,7 +75,25 @@
 
  Take a look at the other [command flags](#usage) for more features.
 
-### Libary
+#### Environment Variables
+
+Instead of specifying command line options each time, you can also use environment variables to set the default values.
+Environment variables are automatically checked and used if available. Environment variables take precedence over the default values.
+
+Available environment variables:
+
+DEFAULT_RCON_ADDRESS: Address of the server you want to connect to.
+DEFAULT_RCON_PASSWORD: Password of the RCON server you want to connect to.
+DEFAULT_RCON_TIMEOUT: Default timeout for the connection to the server.
+Example:
+
+```bash
+export DEFAULT_RCON_ADDRESS="my-server:25575"
+export DEFAULT_RCON_PASSWORD="my-password"
+export DEFAULT_RCON_TIMEOUT="10s"
+```
+
+### Libary usage
 
  Install the module using:
 
@@ -101,7 +119,7 @@
  Execute a command over RCON:
 
  ```go
- output, err := client.ExecuteCmd("<your-command>")
+ output, err := client.ExecuteCmd("some-command")
  if err != nil {
    panic(err)
  }
